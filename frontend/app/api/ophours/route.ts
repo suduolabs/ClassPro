@@ -20,6 +20,13 @@ export async function POST(req: Request) {
 		);
 	}
 
+	if (!supabase) {
+		return Response.json(
+			{ error: "Optional hours storage is not configured" },
+			{ status: 503 },
+		);
+	}
+
 	const ophoursString = ophours.join(",");
 
 	try {

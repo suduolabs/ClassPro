@@ -24,7 +24,7 @@ export default function Timetable({
 				<div className="flex items-center justify-center gap-3">
 					<a
 						href="/api/timetable"
-						download
+						download="Timetable-ClassPro.png"
 						className="p-1 rounded-lg transition-all duration-150 hover:bg-light-button dark:hover:bg-dark-button"
 					>
 						<FiDownload className="text-lg text-light-accent dark:text-dark-accent cursor-pointer" />

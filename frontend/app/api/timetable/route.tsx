@@ -1,42 +1,24 @@
 import type { Schedule, ScheduleSlot } from "@/types/Timetable";
 import { ImageResponse } from "next/og";
 import { Time, timeConvert } from "@/utils/Times";
-import { cookies } from "next/headers";
-import { supabase } from "@/utils/Database/supabase";
-import { encode } from "@/utils/Cookies";
+import { fetchUserData } from "@/hooks/fetchUserData";
 
 export async function GET() {
-	const cookie = await cookies();
-	const key = cookie.get("key")?.value;
+	const { timetable: data, ophour } = await fetchUserData();
 
-	if (!key) {
-		return new Response('Unauthorized', { status: 401 });
+	const timetable = data?.schedule;
+	if (!timetable) {
+		return new Response("Timetable not found", { status: 404 });
 	}
 
-	const { data, error } = await supabase.from("goscrape")
-		.select("timetable,ophour")
-		.eq("token", encode(key))
-		.single();
-
-	if (error) {
-		throw new Error("Data not found!")
-	}
-
-	const json = {
-		timetable: JSON.parse(data?.timetable),
-		ophour: data?.ophour,
-	}
-
-	const timetable = json.timetable.schedule;
-
-	const ophours = json.ophour?.split(",");
+	const ophours = ophour?.split(",");
 	if (ophours?.[0]) {
 		for (const ophour of ophours) {
 			const [day, hour] = ophour.split("-");
 			const dayIndex = Number.parseInt(day.replace("D", "")) - 1;
 			const hourIndex = Number.parseInt(hour.replace("H", "")) - 1;
 
-			const slot = timetable[dayIndex].table[hourIndex];
+			const slot = timetable[dayIndex]?.table[hourIndex];
 			if (slot) slot.isOptional = true;
 		}
 	}
@@ -45,7 +27,7 @@ export async function GET() {
 		new URL("../../../public/fonts/Geist.ttf", import.meta.url),
 	).then((res) => res.arrayBuffer());
 
-	const response = new ImageResponse(
+	return new ImageResponse(
 		<section
 			style={{
 				height: "100%",
@@ -73,18 +55,12 @@ export async function GET() {
 					style: "normal",
 				},
 			],
+			headers: {
+				"Cache-Control": "private, no-store, must-revalidate",
+				"Vary": "Cookie",
+			},
 		},
 	);
-
-	return new Response(await response.arrayBuffer(), {
-		headers: {
-			'Content-Type': 'image/png',
-			'Cache-Control': 'private, no-store, no-cache, must-revalidate, proxy-revalidate',
-			'Pragma': 'no-cache',
-			'Expires': '0',
-			'Vary': 'Cookie',
-		},
-	});
 }
 function TimeArr() {
 	return (
