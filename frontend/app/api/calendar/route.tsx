@@ -2,22 +2,9 @@ import type { Day } from "@/types/Calendar";
 import { ImageResponse } from "next/og";
 import { fetchCalendar } from "@/hooks/fetchCalendar";
 import { NextRequest } from "next/server";
+import { monthName } from "@/utils/Times";
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const months = [
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December",
-];
 
 export async function GET(request: NextRequest) {
 	try {
@@ -42,7 +29,7 @@ export async function GET(request: NextRequest) {
 						tw="my-8 flex items-baseline min-w-[220px] justify-start ml-48 w-full"
 					>
 						<h1 tw="font-semibold text-[#FFF] mt-3 text-6xl">
-							{month.includes("Jul") ? months[monthIndex + 6] : months[monthIndex]}
+							{monthName(month)}
 						</h1>
 						<p tw="text-3xl text-[#FFF] -mt-2 font-medium md:font-semibold ml-2 opacity-60">
 							20{month.split("'")[1]}

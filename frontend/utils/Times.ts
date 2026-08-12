@@ -37,6 +37,29 @@ export function timeConvert(time: string) {
 	return convertedTime.join("");
 }
 
+const monthNames = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+];
+
+/** Calendar months arrive as "Aug '26". Names come from the string, never from
+ * the array index: a semester can start in any month. */
+export function monthName(month: string | undefined): string {
+	if (!month) return "";
+	const prefix = month.slice(0, 3).toLowerCase();
+	return monthNames.find((m) => m.toLowerCase().startsWith(prefix)) ?? month;
+}
+
 export const getIstTime = (): Date => {
 	const currentTime = new Date();
 	const currentOffset = currentTime.getTimezoneOffset();
