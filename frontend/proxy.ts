@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = [
-	"/academia",
-	"/academia/courses",
-	"/academia/library",
-	"/academia/faculties",
-];
+// Everything under /academia needs a session. Listing the pages one by one
+// left /academia/calendar, /gradex and /links reachable without a cookie, and
+// they render against a backend call with an empty token.
+const isProtected = (pathname: string) => pathname.startsWith("/academia");
 const home = ["/"];
 const MAINTENANCE = false;
 
@@ -31,7 +29,7 @@ export function proxy(request: NextRequest) {
 	if (!isAuthenticated(request) && home.includes(pathname)) {
 		return NextResponse.redirect(new URL("/home", request.url));
 	}
-	if (protectedRoutes.includes(pathname) && !isAuthenticated(request)) {
+	if (isProtected(pathname) && !isAuthenticated(request)) {
 		return NextResponse.redirect(new URL("/auth/login", request.url));
 	}
 
