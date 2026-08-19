@@ -13,18 +13,20 @@ View, predict, and strategize your success.
 > 
 > ```
 > classpro/
-> ├── frontend/          # Next.js frontend application
-> ├── backend/           # Go backend API
-> ├── .env.example       # Environment variables template
+> ├── frontend/            # Next.js frontend application
+> ├── backend/             # Go backend API (git submodule: rahuletto/goscraper)
+> ├── .env.example         # Environment variables template
+> ├── docker-compose.yml   # Runs both services together
+> ├── Makefile             # Shortcuts around docker compose
+> ├── netlify.toml         # Frontend deploy config and short-link redirects
 > ├── package.json
-> ├── compose.yaml
 > └── README.md
 > ```
 
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) (>=1.2.0)
+- [Bun](https://bun.sh/) (>=1.2.21)
 - [Go](https://golang.org/) (>=1.23.0)
 - [Docker](https://docker.com/) (optional, for containerized deployment)
 
@@ -55,17 +57,26 @@ Copy from `.env.example` and paste it in the root directory
 SUPABASE_URL="your_supabase_url"
 SUPABASE_KEY="your_supabase_anon_key"
 VALIDATION_KEY="your_validation_key"
+BACKEND_URL="http://localhost:8080"
 
-# Frontend Specific (Mostly autofilled by the variables)
-NEXT_PUBLIC_URL="http://localhost:8080"
+# Backend Specific
+ENCRYPTION_KEY="your_encryption_key"
+URL="http://localhost:3000,http://localhost:0243,https://class-pro.vercel.app"
+
+# Frontend Specific (autofilled from the variables above)
+NEXT_PUBLIC_URL="${BACKEND_URL}"
 NEXT_PUBLIC_SUPABASE_URL="${SUPABASE_URL}"
 NEXT_PUBLIC_SERVICE_KEY="${SUPABASE_KEY}"
 NEXT_PUBLIC_VALIDATION_KEY="${VALIDATION_KEY}"
 
-# Backend Specific
-ENCRYPTION_KEY="your_encryption_key"
-URL="http://localhost:3000,http://localhost:0243"
+PORT="8080"
+HOST="localhost"
+NODE_ENV="development"
+GO_ENV="development"
 ```
+
+`URL` is the backend's CORS allowlist -- every origin the frontend is served
+from has to be in it.
 
 
 > [!TIP]
