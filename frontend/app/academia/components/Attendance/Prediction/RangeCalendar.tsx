@@ -13,6 +13,20 @@ import { months } from "..";
 
 type DateCategory = "Leave" | "OD";
 
+/** First day of the month a "Aug '26" entry names, or undefined when the
+ * calendar failed to load. Returning undefined lets the picker fall back to its
+ * own bounds; findIndex answering -1 used to build December of the year
+ * before. */
+function boundaryMonth(entry: CalendarType | undefined): Date | undefined {
+	const [name, year] = (entry?.month ?? "").split("'");
+	const index = months.findIndex((month) => month.trim() === name?.trim());
+	if (index === -1) return undefined;
+	return new Date(
+		year?.trim() ? 2000 + Number(year.trim()) : new Date().getFullYear(),
+		index,
+	);
+}
+
 interface LeaveOdRangeCalendarProps {
     categorizedRanges: CategorizedDateRange[];
     setCategorizedRanges: React.Dispatch<React.SetStateAction<CategorizedDateRange[]>>;
@@ -165,25 +179,8 @@ export function LeaveODRangeCalendar({
 								return cal?.dayOrder === "-";
 							},
 						]}
-						startMonth={
-							new Date(
-								new Date().getFullYear(),
-								months.findIndex(
-									(month) =>
-										month.trim() === calendar[0].month.split("'")[0].trim(),
-								),
-							)
-						}
-						endMonth={
-							new Date(
-								new Date().getFullYear(),
-								months.findIndex(
-									(month) =>
-										month.trim() ===
-										calendar[calendar.length - 1].month.split("'")[0].trim(),
-								),
-							)
-						}
+						startMonth={boundaryMonth(calendar[0])}
+						endMonth={boundaryMonth(calendar[calendar.length - 1])}
 					/>
 				</div>
 				<div className="w-full lg:w-1/2 lg:max-w-[50%]">

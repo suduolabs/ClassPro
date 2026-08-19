@@ -5,7 +5,7 @@ import type { Calendar } from "@/types/Calendar";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Loading from "@/components/States/Loading";
 import { FiDownload } from "react-icons/fi";
-import { monthName } from "@/utils/Times";
+import { monthName, monthYear } from "@/utils/Times";
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -71,7 +71,7 @@ export default function CalendarGrid({
 								{monthName(calendar[month]?.month)}
 							</h1>
 							<p className="text-md font-medium md:font-semibold opacity-60">
-								20{calendar[calendar.length - 1].month.split("'")[1]}
+								{monthYear(calendar[month]?.month)}
 							</p>
 						</div>
 						<button

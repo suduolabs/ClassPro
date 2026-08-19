@@ -60,6 +60,14 @@ export function monthName(month: string | undefined): string {
 	return monthNames.find((m) => m.toLowerCase().startsWith(prefix)) ?? month;
 }
 
+/** The four digit year for a "Aug '26" month string. Empty when the month is
+ * missing or carries no year, which happens whenever the calendar failed to
+ * load. */
+export function monthYear(month: string | undefined): string {
+	const yy = month?.split("'")[1]?.trim();
+	return yy ? `20${yy}` : "";
+}
+
 export const getIstTime = (): Date => {
 	const currentTime = new Date();
 	const currentOffset = currentTime.getTimezoneOffset();
