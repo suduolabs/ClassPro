@@ -21,23 +21,14 @@ const nextConfig: NextConfig = {
 	},
 	async headers() {
 		return [
+			// Only the hand-placed files under public/. Next serves those with
+			// `public, max-age=0`, so a font or icon is revalidated on every
+			// navigation; they change when someone replaces the file, so a day is
+			// safe. Pages are deliberately not listed: /academia is per-user HTML
+			// and Next already marks it private.
 			{
-				source: '/(.*)',
-				headers: [
-					{
-						key: 'Cache-Control',
-						value: 'public, max-age=3600, stale-while-revalidate=86400',
-					},
-				],
-			},
-			{
-				source: '/api/(.*)',
-				headers: [
-					{
-						key: 'Cache-Control',
-						value: 'public, max-age=300, stale-while-revalidate=600',
-					},
-				],
+				source: "/:dir(fonts|icons|images|screenshots|library)/:path*",
+				headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
 			},
 		];
 	},
