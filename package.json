@@ -2,7 +2,7 @@
   "name": "classpro-monorepo",
   "version": "3.1.2",
   "private": true,
-  "packageManager": "bun@1.1.38",
+  "packageManager": "bun@1.2.21",
   "workspaces": [
     "frontend",
     "backend"
@@ -25,17 +25,25 @@
     "clean": "rimraf frontend/node_modules frontend/.next backend/bin",
     "docker:build": "docker compose build",
     "docker:up": "docker compose up",
-    "docker:down": "docker compose down"
+    "docker:down": "docker compose down",
+    "test": "vitest run && node --test tests/*.test.cjs",
+    "typecheck": "tsc --noEmit -p frontend/tsconfig.json"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.10.10",
+    "@vitejs/plugin-react": "^4.7.0",
     "concurrently": "^8.2.2",
     "copyfiles": "^2.4.1",
-    "rimraf": "^5.0.7"
+    "jsdom": "^26.1.0",
+    "rimraf": "^5.0.7",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=20.11.0",
-    "bun": ">=1.1.0",
+    "bun": ">=1.2.21",
     "go": ">=1.23.0"
   }
-} 
+}

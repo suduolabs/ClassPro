@@ -2,31 +2,26 @@ import type { Day } from "@/types/Calendar";
 import { ImageResponse } from "next/og";
 import { fetchCalendar } from "@/hooks/fetchCalendar";
 import { NextRequest } from "next/server";
+import { monthName, monthYear } from "@/utils/Times";
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const months = [
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December",
-];
 
 export async function GET(request: NextRequest) {
+	// Session redirects must reach Next.js rather than the image-rendering catch.
+	const { calendar } = await fetchCalendar();
 	try {
 		const { searchParams } = new URL(request.url);
 		const monthIndex = parseInt(searchParams.get("month") || "0");
 
-		const { calendar } = await fetchCalendar();
-		const month = calendar[monthIndex]?.month || calendar[0]?.month;
-		const days = calendar[monthIndex]?.days || calendar[0]?.days;
+		// A signed-out session scrapes to an empty calendar. Reading a month off
+		// it threw, and the catch below turned that into a 500 on a download the
+		// user asked for; say plainly that there is nothing to draw.
+		const requested = calendar?.[monthIndex] ?? calendar?.[0];
+		if (!requested) {
+			return new Response("Calendar not available", { status: 404 });
+		}
+		const month = requested.month;
+		const days = requested.days ?? [];
 
 		const geist = await fetch(
 			new URL("../../../public/fonts/Geist.ttf", import.meta.url),
@@ -42,10 +37,10 @@ export async function GET(request: NextRequest) {
 						tw="my-8 flex items-baseline min-w-[220px] justify-start ml-48 w-full"
 					>
 						<h1 tw="font-semibold text-[#FFF] mt-3 text-6xl">
-							{month.includes("Jul") ? months[monthIndex + 6] : months[monthIndex]}
+							{monthName(month)}
 						</h1>
 						<p tw="text-3xl text-[#FFF] -mt-2 font-medium md:font-semibold ml-2 opacity-60">
-							20{month.split("'")[1]}
+							{monthYear(month)}
 						</p>
 					</div>
 
@@ -92,7 +87,8 @@ export async function GET(request: NextRequest) {
 		console.warn(err);
 		return new Response(
 			JSON.stringify({
-				error: err.stack,
+				// The stack used to go out in the body of a public route.
+				error: "Failed to render the calendar image",
 			}),
 			{
 				status: 500,

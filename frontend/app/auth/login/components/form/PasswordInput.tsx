@@ -27,17 +27,22 @@ export default function PasswordInput({
 	return (
 		<>
 			<input
+				id="academia-password"
+				name="password"
+				autoComplete="current-password"
+				aria-label="Password"
 				type={visible ? "text" : "password"}
 				value={password}
 				onKeyDown={handleKeyDown}
 				className={"rounded-2xl rounded-tl-[6px] rounded-tr-[6px] dark:bg-dark-input bg-light-input px-6 py-3 font-sans font-medium text-light-color dark:text-dark-color"}
 				onChange={(e) => setPassword(e.target.value)}
 				placeholder="Passw*rd"
+				required
 			/>
 			{password && (
 				<button
 					type="button"
-					tabIndex={-1}
+					aria-label={visible ? "Hide password" : "Show password"}
 					onKeyDown={handleKeyDown}
 					className="absolute bottom-[16px] right-0 pr-4 text-right text-light-accent dark:text-dark-accent"
 					onClick={() => setVisible((e) => !e)}

@@ -8,12 +8,13 @@
 
 [build.environment]
   NODE_VERSION = "22"
-  BUN_VERSION = "1.1.38"
+  BUN_VERSION = "1.2.21"
 
 [dev]
   command = "bun run dev"
   port = 3000
-  targetPort = 3000
+  # next dev binds 0243 (frontend/package.json), so netlify dev has to proxy there.
+  targetPort = 243
 
 [[redirects]]
   from = "/elab"

@@ -1,5 +1,6 @@
 export function setCookie(name:string, value: string, expirationMonths = 3) {
 	if (typeof document === "undefined") return null;
+	if (!name || !value) return null;
 
 		const exdate = new Date();
 		exdate.setMonth(exdate.getMonth() + expirationMonths);
@@ -17,6 +18,8 @@ export function setCookie(name:string, value: string, expirationMonths = 3) {
 
 
 export function encode(str: string): string {
+	if (!str) return "";
+
 	let hash = 2166136261;
 	for (let i = 0; i < str?.length; i++) {
 		hash ^= str.charCodeAt(i);

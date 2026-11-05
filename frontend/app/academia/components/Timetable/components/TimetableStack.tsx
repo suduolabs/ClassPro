@@ -1,7 +1,7 @@
 "use client";
 import type { Day } from "@/types/Calendar";
 import type { Schedule } from "@/types/Timetable";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import TableCell from "./TableCell";
 import { getIstTime, Time } from "@/utils/Times";
@@ -24,6 +24,10 @@ export default function TimetableStack({
 		today?.dayOrder === "-" ? "0" : today?.dayOrder,
 	);
 	const [currentTime, setTime] = useState<Date>(getIstTime());
+
+	useInterval(() => {
+		setTime(getIstTime());
+	}, 30 * 1000);
 
 	const scheduleToday =
 		schedule?.find((item) => item.day === Number(dOrder)) ?? schedule?.[0];
@@ -55,14 +59,6 @@ export default function TimetableStack({
 		currentTime,
 		`${Time.start[0]}-${Time.end[Time.end.length - 1]}`,
 	);
-
-	useMemo(() => {
-		setTime(getIstTime());
-	}, []);
-
-	useInterval(() => {
-		setTime(getIstTime());
-	}, 30 * 1000);
 
 	return (
 		<>

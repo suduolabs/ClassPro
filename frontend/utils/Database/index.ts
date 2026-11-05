@@ -15,6 +15,7 @@ interface DatabaseRecord {
 
 class Database {
 	async getEvents(): Promise<CalendarData[]> {
+		if (!supabase) throw new Error("Persistence is not configured");
 		const { data, error } = await supabase
 			.from("gocal")
 			.select("*");
@@ -64,6 +65,7 @@ class Database {
 	// Method to get data by regNumber
 	async getData(regNumber: string): Promise<DatabaseRecord | null> {
 		try {
+			if (!supabase) return null;
 			const { data, error } = await supabase
 				.from("goscrape") // Replace with your actual table name
 				.select("*")
@@ -88,6 +90,7 @@ class Database {
 		selector = "*",
 	): Promise<DatabaseRecord | null> {
 		try {
+			if (!supabase) return null;
 			const { data, error } = await supabase
 				.from("goscrape") // Replace with your actual table name
 				.select(selector)
@@ -110,6 +113,7 @@ class Database {
 
 	async checkCookie(cookie: string): Promise<DatabaseRecord | null> {
 		try {
+			if (!supabase) return null;
 			const { data, error } = await supabase
 				.from("goscrape") // Replace with your actual table name
 				.select("*")
@@ -133,6 +137,7 @@ class Database {
 	// Method to delete data by regNumber
 	async deleteData(regNumber: string): Promise<void> {
 		try {
+			if (!supabase) throw new Error("Persistence is not configured");
 			const { error } = await supabase
 				.from("goscrape") // Replace with your actual table name
 				.delete()
