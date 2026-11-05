@@ -46,51 +46,66 @@ export default function Form() {
 			body.cdigest = cdigestValue;
 		}
 
-		const login = await fetch(`${rotateUrl()}/login`, {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${token()}`,
-				"content-type": "application/json",
-			},
-			body: JSON.stringify(body),
-		});
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 15_000);
+		try {
+			const login = await fetch(`${rotateUrl()}/login`, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${token()}`,
+					"content-type": "application/json",
+				},
+				body: JSON.stringify(body),
+				signal: controller.signal,
+			});
 
-		if (!login.ok) {
-			setStatus(-1);
-			setMessage("Server down.");
-			return;
-		}
-
-		const loginResponse = await login.json();
-
-		if (loginResponse.authenticated) {
-			setStatus(2);
-			setMessage("Loading data...");
-			if(!loginResponse.cookies) {
+			if (!login.ok) {
 				setStatus(-1);
-				setMessage("No cookies received. Wrong password.");
+				setMessage("Server down.");
 				return;
 			}
-			setCookie("key", loginResponse.cookies);
-			
-			setCaptchaImage(null);
-			setCdigest(null);
-			setCaptchaInput("");
-			
-			router.push("/academia");
-		} else if (loginResponse?.captcha) {
-			setStatus(0);
-			setCaptchaImage(loginResponse.captcha.image);
-			setCdigest(loginResponse.captcha.cdigest);
-			setMessage(loginResponse.message || "Please enter the CAPTCHA.");
-		} else if (loginResponse?.message) {
+
+			const loginResponse = await login.json();
+			if (!loginResponse || typeof loginResponse !== "object") throw new Error("Invalid login response");
+
+			if (loginResponse.authenticated) {
+				setStatus(2);
+				setMessage("Loading data...");
+				if(typeof loginResponse.cookies !== "string" || !loginResponse.cookies) {
+					setStatus(-1);
+					setMessage("No cookies received. Wrong password.");
+					return;
+				}
+				setCookie("key", loginResponse.cookies);
+
+				setCaptchaImage(null);
+				setCdigest(null);
+				setCaptchaInput("");
+
+				router.push("/academia");
+			} else if (loginResponse?.captcha) {
+				setStatus(0);
+				setCaptchaImage(loginResponse.captcha.image);
+				setCdigest(loginResponse.captcha.cdigest);
+				setMessage(loginResponse.message || "Please enter the CAPTCHA.");
+			} else if (loginResponse?.message) {
+				setStatus(-1);
+				if (loginResponse.message?.includes("Digest"))
+					setMessage(
+						"Seems like this is your first time. Go to academia.srmist.edu.in and setup password!",
+					);
+				else setMessage(loginResponse?.message);
+			} else {
+				setStatus(-1);
+				setMessage("Unexpected login response. Please try again.");
+			}
+		} catch {
 			setStatus(-1);
-			if (loginResponse.message?.includes("Digest"))
-				setMessage(
-					"Seems like this is your first time. Go to academia.srmist.edu.in and setup password!",
-				);
-			else setMessage(loginResponse?.message);
+			setMessage("Unable to reach the login service. Please try again.");
+		} finally {
+			clearTimeout(timeoutId);
 		}
+
 	}, [router]);
 
 	return (
@@ -98,6 +113,9 @@ export default function Form() {
 			className="flex flex-col gap-6"
 			onSubmit={(e) => {
 				e.preventDefault();
+				if (!uid || !pass || status === 1 || status === 2) return;
+				if (captchaImage && (!cdigest || !captchaInput)) return;
+				void handleLogin(uid, pass, captchaInput || undefined, cdigest || undefined);
 			}}
 		>
 			{status === -1 && (
@@ -127,9 +145,9 @@ export default function Form() {
 			{captchaImage && cdigest && (
 				<div className="flex flex-col gap-3">
 					<div className="flex items-center justify-center">
-						<img 
-							src={captchaImage} 
-							alt="CAPTCHA" 
+						<img
+							src={captchaImage}
+							alt="CAPTCHA"
 							className="rounded-xl"
 						/>
 					</div>
@@ -168,13 +186,6 @@ export default function Form() {
 									: ""
 					}`}
 					type="submit"
-					onClick={() => {
-						if (captchaImage && cdigest && captchaInput) {
-							handleLogin(uid, pass, captchaInput, cdigest);
-						} else {
-							handleLogin(uid, pass);
-						}
-					}}
 				>
 					{status === 1 ? "Authenticating" : status === 2 ? "Success" : "Login"}
 				</Button>

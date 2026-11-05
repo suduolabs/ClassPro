@@ -13,7 +13,7 @@ export default async function ViewAll() {
 			const dayIndex = Number.parseInt(day.replace("D", "")) - 1;
 			const hourIndex = Number.parseInt(hour.replace("H", "")) - 1;
 
-			const slot = timetable.schedule[dayIndex]?.table[hourIndex];
+			const slot = timetable?.schedule?.[dayIndex]?.table[hourIndex];
 			if (slot) slot.isOptional = true;
 		}
 	}
@@ -24,7 +24,7 @@ export default async function ViewAll() {
         <div className='flex flex-col max-w-[1710px] w-full h-full aspect-[1710/700] relative'>
             <div className='absolute inset-0'>
                 <TimeArr />
-                <TimetableImage timetable={timetable.schedule} />
+                <TimetableImage timetable={timetable?.schedule ?? []} />
             </div>
         </div>
         </main>

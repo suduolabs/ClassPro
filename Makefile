@@ -9,80 +9,80 @@ help:
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 
-build: 
+build: ## Build both images
 	docker compose build
 
-up: 
+up: ## Start both services detached
 	docker compose up -d
 
-down: 
+down: ## Stop both services
 	docker compose down
 
-logs: 
+logs: ## Follow logs for both services
 	docker compose logs -f
 
-status: 
+status: ## Show container status
 	docker compose ps
 
 
-frontend-build: 
+frontend-build: ## Build the frontend image only
 	docker build -t classpro-frontend ./frontend
 
-frontend-up: 
+frontend-up: ## Start the frontend alone
 	cd frontend && docker compose up -d
 
-frontend-down: 
+frontend-down: ## Stop the standalone frontend
 	cd frontend && docker compose down
 
-frontend-logs: 
+frontend-logs: ## Follow frontend logs
 	cd frontend && docker compose logs -f
 
-backend-build: 
-	docker build -f dockerfile -t classpro-backend ./backend
+backend-build: ## Build the backend image only
+	docker build -f backend/dockerfile -t classpro-backend ./backend
 
-backend-up: 
+backend-up: ## Start the backend alone
 	cd backend && docker compose up -d
 
-backend-down: 
+backend-down: ## Stop the standalone backend
 	cd backend && docker compose down
 
-backend-logs: 
+backend-logs: ## Follow backend logs
 	cd backend && docker compose logs -f
 
 
-dev: 
+dev: ## Run the frontend dev server in a container
 	docker compose run --service-ports frontend bun run dev
 
-dev-backend: 
+dev-backend: ## Run the backend dev server in a container
 	docker compose run --service-ports backend go run src/main.go
 
 
-clean: 
+clean: ## Remove containers, images, volumes and prune
 	docker compose down --rmi all --volumes --remove-orphans
 	docker system prune -f
 
-restart: 
+restart: ## Restart both services
 	docker compose restart
 
-restart-frontend: 
+restart-frontend: ## Restart the frontend
 	docker compose restart frontend
 
-restart-backend: 
+restart-backend: ## Restart the backend
 	docker compose restart backend
 
 
-health: 
+health: ## Print container status and ports
 	@echo "Checking service health..."
 	@docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
 
 
-shell-frontend: 
+shell-frontend: ## Open a shell in the frontend container
 	docker compose exec frontend sh
 
-shell-backend: 
+shell-backend: ## Open a shell in the backend container
 	docker compose exec backend sh
 
-start: build up
+start: build up ## Build then start everything
 	@echo "ClassPro is starting..."
 	@echo "Frontend: http://localhost:243"
 	@echo "Backend:  http://localhost:8080"

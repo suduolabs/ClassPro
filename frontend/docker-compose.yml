@@ -1,21 +1,21 @@
-version: '3.8'
-
 services:
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: classpro-frontend-standalone
+    # NEXT_PUBLIC_* is inlined into the client bundle while the image builds,
+    # so it has to come from frontend/.env at build time -- setting it here or
+    # mounting .env at runtime does nothing. Run `bun run sync:env` first.
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
     ports:
       - "243:243"
-    volumes:
-      - ./.env:/app/.env:ro
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:243/api/health"]
+      # node, not wget: the final image is node:22-slim, which ships neither
+      # wget nor curl. node is always there.
+      test: ["CMD", "node", "-e", "fetch('http://localhost:243/home').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 10s
       retries: 3

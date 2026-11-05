@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedRoutes = [
-	"/academia",
-	"/academia/courses",
-	"/academia/library",
-	"/academia/faculties",
-];
+const protectedRoutes = ["/academia"];
 const home = ["/"];
 const MAINTENANCE = false;
 
 const isAuthenticated = (request: NextRequest): boolean => {
-	const token = request.cookies.get("key");
-	return !!token?.value;
+    const token = request.cookies.get("key");
+    return Boolean(token?.value.trim());
 };
 
 export function proxy(request: NextRequest) {
@@ -31,7 +26,10 @@ export function proxy(request: NextRequest) {
 	if (!isAuthenticated(request) && home.includes(pathname)) {
 		return NextResponse.redirect(new URL("/home", request.url));
 	}
-	if (protectedRoutes.includes(pathname) && !isAuthenticated(request)) {
+	const isProtected = protectedRoutes.some(
+		(route) => pathname === route || pathname.startsWith(`${route}/`),
+	);
+	if (isProtected && !isAuthenticated(request)) {
 		return NextResponse.redirect(new URL("/auth/login", request.url));
 	}
 

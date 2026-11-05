@@ -19,7 +19,7 @@
 
 When adding new URLs to the collection:
 
-1. Follow the existing structure in `misc/links.ts`
+1. Follow the existing structure in `frontend/misc/links.ts`
 2. Ensure the URL is active and accessible
 3. Type should be "unofficial" to indicate its not from SRM or use "official"
 4. Include a brief description
@@ -35,7 +35,7 @@ When adding new URLs to the collection:
 
 ## Theming
 
-visit ClassPro/frontend/misc/theme.ts to make changes
+Themes live in `frontend/misc/theme.ts`.
 
 When creating or modifying themes:
 
@@ -65,6 +65,8 @@ When creating or modifying themes:
         "success-color": "R G B",
         "info-background": "R G B",
         "info-color": "R G B",
+        theory: "R G B",
+        practical: "R G B",
     }
 }
 ```
@@ -79,7 +81,7 @@ When creating or modifying themes:
    - Interactive elements (input, button)
    - Status colors (error, warn, success, info)
    - Content colors (accent, color)
-   - Please use the default colors as possible for theory, practical
+   - Course type colors (theory, practical) - keep the defaults unless the theme genuinely needs otherwise
 
 ## Pull Request Process
 

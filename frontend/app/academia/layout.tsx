@@ -25,8 +25,8 @@ export default async function RootLayout({
 						className="fixed hidden right-9 md:flex items-center justify-center"
 					/>
 				}
-				profile={
-					json?.error ? (
+			profile={
+				json?.error || !json?.user ? (
 						<Link
 							href="/auth/login"
 							className="text-light-success-color dark:text-dark-success-color bg-light-success-background dark:bg-dark-success-background rounded-full font-semibold flex items-center justify-center py-3 lg:w-[82%] gap-2 "
@@ -35,7 +35,7 @@ export default async function RootLayout({
 						</Link>
 					) : (
 						<ProfileBadge
-							user={json?.user as UserInfo}
+							user={json.user as UserInfo}
 						/>
 					)
 				}

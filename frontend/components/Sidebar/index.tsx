@@ -8,6 +8,7 @@ import {
   FaWhatsapp,
 } from 'react-icons/fa6';
 import { BsCalendar2WeekFill } from 'react-icons/bs';
+import { BsCalculatorFill } from 'react-icons/bs';
 import { FiGithub } from 'react-icons/fi';
 import { MdHelpOutline } from 'react-icons/md';
 import dynamic from 'next/dynamic';
@@ -29,8 +30,6 @@ const OpenButton = dynamic(
 );
 import ThemeToggle from '@/components/themes/ThemeToggle';
 import { IoLibrarySharp } from 'react-icons/io5';
-import { BsCalculatorFill } from 'react-icons/bs';
-// import GradeXIcon from '@/public/images/GradeX';
 
 export function Sidebar({
   dayorder,
@@ -41,7 +40,7 @@ export function Sidebar({
   mini: ReactNode;
   profile?: ReactNode;
 }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   useGestures({
     onSwipeLeft: () => {
@@ -52,17 +51,17 @@ export function Sidebar({
     },
   });
   useEffect(() => {
-    const isMobile = window.innerWidth <= 1024;
-    const sidebarWidth = isOpen ? '310px' : isMobile ? '0px' : '60px';
+    const isMobile = window.matchMedia('(max-width: 1024px)').matches;
+    const sidebarWidth = isMobile ? '0px' : isOpen ? '310px' : '60px';
     document.documentElement.style.setProperty('--sidebar-width', sidebarWidth);
   }, [isOpen]);
 
   useEffect(() => {
-    const isMobile = window.innerWidth <= 1024;
+    const isMobile = window.matchMedia('(max-width: 1024px)').matches;
     if (isMobile) setIsOpen(false);
 
     const handleResize = () => {
-      const isMobile = window.innerWidth <= 1024;
+      const isMobile = window.matchMedia('(max-width: 1024px)').matches;
       setIsOpen(!isMobile);
     };
     window.addEventListener('resize', handleResize);
@@ -127,15 +126,12 @@ export function Sidebar({
           </div>
 
           <hr className='border-t-light-side dark:border-t-dark-side' />
-          <Link
-              onClick={handleClick}
-              href='/academia/gradex'
-            >
-            <BsCalculatorFill className='text-xl text-light-color dark:text-dark-color' />
-              <span className="text-light-color dark:text-dark-color">GradeX</span>
-            </Link>
-          <Link title="Question papers" href="/academia/library">
-            <IoLibrarySharp className="text-xl text-light-color dark:text-dark-color" />
+          <Link title='Grade calculator' href='/academia/gradex' onClick={handleClick}>
+            <BsCalculatorFill className='text-xl' />
+            GradeX
+          </Link>
+          <Link title="Question papers" href="/academia/library" onClick={handleClick}>
+            <IoLibrarySharp className="text-xl" />
             <span className="flex items-center justify-start gap-3 text-light-color dark:text-dark-color">
               Library{" "}
               <span className="text-xs px-1 rounded-md bg-light-accent dark:bg-dark-accent text-light-background-light dark:text-dark-background-dark py-0.5">
@@ -143,19 +139,6 @@ export function Sidebar({
               </span>
             </span>
           </Link>
-          {/* 
-					
-          <Link
-            aria-disabled
-            className="relative cursor-not-allowed border border-dashed border-[#F34F4F1e] font-semibold text-[#F34F4F] hover:bg-[#F34F4F1e] hover:text-[#F34F4F] dark:text-[#F34F4F] dark:hover:bg-[#F34F4F1e] dark:hover:text-[#F34F4F]"
-            title="Coming Soon"
-            href="#"
-          >
-            <BsFillPinAngleFill className="text-xl" />
-            <span className="text-xl">🏗️</span>
-            Events
-          </Link>
-           */}
         </div>
 
         <div className='flex flex-col-reverse gap-4'>
